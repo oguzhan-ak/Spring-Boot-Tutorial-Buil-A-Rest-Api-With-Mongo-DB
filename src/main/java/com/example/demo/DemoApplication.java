@@ -32,6 +32,17 @@ public class DemoApplication {
         repository.insert(student);
     }
 
+    private static void usingFind(StudentRepository repository, Student student) {
+        repository.findStudentByEmailEquals(student.getEmail())
+                .ifPresentOrElse(s -> {
+                    System.out.println("Already exist " + student);
+                    throw new IllegalStateException("found many students with email " + student.getEmail());
+                }, () -> {
+                    System.out.println("Inserting student " + student);
+                    repository.insert(student);
+                });
+    }
+
     @Bean
     CommandLineRunner runner(StudentRepository repository,
                              MongoTemplate mongoTemplate) {
@@ -52,14 +63,7 @@ public class DemoApplication {
                     LocalDateTime.now()
             );
 //            usingMongoTemplateAndQuery(repository, mongoTemplate, student);
-            repository.findStudentByEmailEquals(student.getEmail())
-                    .ifPresentOrElse(s -> {
-                        System.out.println("Already exist " + student);
-                        throw new IllegalStateException("found many students with email " + student.getEmail());
-                    }, () -> {
-                        System.out.println("Inserting student " + student);
-                        repository.insert(student);
-                    });
+//            usingFind(repository, student);
         };
     }
 }
